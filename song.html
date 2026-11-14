@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>RingCut – Make Your Ringtone</title>
+    <style>
+         :root {
+            --bg: #0a0a12;
+            --surface: #13131f;
+            --surface2: #1c1c2e;
+            --accent: #7c3aed;
+            --accent-light: #a78bfa;
+            --accent-glow: rgba(124, 58, 237, 0.3);
+            --text: #f1f0f7;
+            --muted: #6b6b8a;
+            --danger: #ef4444;
+            --success: #10b981;
+            --border: rgba(124, 58, 237, 0.2);
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        
+        @media (prefers-color-scheme: light) {
+             :root:not([data-theme="dark"]) {
+                --bg: #f5f4ff;
+                --surface: #ffffff;
+                --surface2: #ede9fe;
+                --text: #1e1b30;
+                --muted: #6b6b8a;
+                --border: rgba(124, 58, 237, 0.2);
+            }
+        }
+        
+        *,
+        *::before,
+        *::after {
+            box-sizing: inherit;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html,
+        body {
+            height: 100%;
+        }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100%;
+            padding: 0 0 env(safe-area-inset-bottom, 0px);
+        }
+        /* Header */
+        
+        .header {
+            text-align: center;
+            padding: 48px 24px 24px;
+        }
+        
+        .logo {
+            font-size: 13px;
+            letter-spacing: 0.15em;
+            color: var(--accent-light);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 {
+            font-size: clamp(28px, 7vw, 42px);
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        
+        .header h1 span {
+            color: var(--accent-light);
+        }
+        
+        .header p {
+            color: var(--muted);
+            font-size: 15px;
+            max-width: 320px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        /* Main container */
+        
+        .main {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 8px 20px 48px;
+        }
+        /* Step indicators */
+        
+        .steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 32px;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-num {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+        
+        .step.done .step-num {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+        
+        .step-label {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .step.active .step-label {
+            color: var(--accent-light);
+        }
+        
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border);
+            margin: 0 6px;
+            margin-bottom: 18px;
+            max-width: 48px;
+        }
+        /* Cards */
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-light);
+            letter-spacing: 0.08em;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+        /* Upload zone */
+        
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--surface2);
+            position: relative;
+        }
+        
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.08);
+        }
+        
+        .upload-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .upload-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .upload-zone p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        
+        .upload-zone strong {
+            color: var(--accent-light);
+            display: block;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+        /* Song info */
+        
+        .song-info {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: var(--surface2);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        
+        .song-info.visible {
+            display: flex;
+        }
+        
+        .song-disc {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            animation: spin 4s linear infinite paused;
+        }
+        
+        .song-disc.playing {
+            animation-play-state: running;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .song-meta {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .song-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .song-duration {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+        /* Waveform canvas */
+        
+        .waveform-wrap {
+            position: relative;
+            height: 64px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--surface2);
+            display: none;
+        }
+        
+        .waveform-wrap.visible {
+            display: block;
+        }
+        
+        #waveformCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .playhead {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-light);
+            pointer-events: none;
+            left: 0;
+            transition: none;
+        }
+        /* Trim slider */
+        
+        .trim-section {
+            display: none;
+        }
+        
+        .trim-section.visible {
+            display: block;
+        }
+        
+        .trim-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+        
+        .trim-labels span {
+            color: var(--accent-light);
+            font-weight: 600;
+        }
+        
+        .range-wrap {
+            position: relative;
+            margin-bottom: 8px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--surface2);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent-glow);
+            cursor: pointer;
+        }
+        
+        #trimRange {
+            background: linear-gradient(to right, var(--accent) var(--pct, 50%), var(--surface2) var(--pct, 50%));
+        }
+        
+        .duration-hint {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+        }
+        
+        .duration-hint strong {
+            color: var(--accent-light);
+        }
+        /* Buttons */
+        
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+        
+        .btn-accent:hover:not(:disabled) {
+            background: #6d28d9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--accent-light);
+            border: 1.5px solid var(--border);
+        }
+        
+        .btn-outline:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.08);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        
+        .btn-sm {
+            padding: 9px 16px;
+            font-size: 13px;
+            border-radius: 8px;
+            width: auto;
+            margin: 0;
+        }
+        /* Preview controls */
+        
+        .preview-row {
+            display: none;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-row.visible {
+            display: flex;
+        }
+        
+        .time-display {
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+        /* Instructions */
+        
+        .instructions {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .instructions.visible {
+            display: flex;
+        }
+        
+        .instruction-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: var(--surface2);
+            border-radius: 10px;
+        }
+        
+        .inst-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .inst-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text);
+        }
+        
+        .inst-text strong {
+            color: var(--accent-light);
+        }
+        /* Share */
+        
+        .share-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0 12px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+        
+        .share-divider::before,
+        .share-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        
+        .share-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        
+        .share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fff;
+        }
+        
+        .share-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .share-btn .share-icon {
+            display: flex;
+            align-items: center;
+        }
+        
+        .share-btn.whatsapp {
+            background: #25D366;
+        }
+        
+        .share-btn.whatsapp:hover {
+            background: #1ebe5d;
+        }
+        
+        .share-btn.telegram {
+            background: #229ED9;
+        }
+        
+        .share-btn.telegram:hover {
+            background: #1a8ec4;
+        }
+        
+        .share-btn.native {
+            background: var(--accent);
+            box-shadow: 0 4px 14px var(--accent-glow);
+        }
+        
+        .share-btn.native:hover {
+            background: #6d28d9;
+        }
+        
+        .share-btn.copy {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        
+        .share-btn.copy:hover {
+            border-color: var(--accent);
+            color: var(--accent-light);
+        }
+        
+        .share-note {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+            border: 1px solid var(--border);
+            margin-bottom: 4px;
+        }
+        
+        .share-note strong {
+            color: var(--accent-light);
+        }
+        /* Toast */
+        
+        .toast {
+            position: fixed;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success {
+            border-color: var(--success);
+            color: var(--success);
+        }
+        
+        .toast.error {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        /* Section hidden by default */
+        
+        .section {
+            display: none;
+        }
+        
+        .section.visible {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo">RingCut</div>
+        <h1>Your song,<br><span>your ringtone.</span></h1>
+        <p>Pick any song, trim the best part, download — then set it in 2 taps.</p>
+    </div>
+
+    <div class="main">
+
+        <!-- Step indicators -->
+        <div class="steps">
+            <div class="step active" id="s1">
+                <div class="step-num">1</div>
+                <div class="step-label">Pick Song</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="s2">
+                <div class="step-num">2</div>
+                <div class="step-label">Trim</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="s3">
+                <div class="step-num">3</div>
+                <div class="step-label">Download</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" id="s4">
+                <div class="step-num">4</div>
+                <div class="step-label">Set</div>
+            </div>
+        </div>
+
+        <!-- STEP 1: Pick Song -->
+        <div class="card section visible" id="sec1">
+            <div class="card-title">Pick your song</div>
+            <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept="audio/*">
+                <span class="upload-icon">🎵</span>
+                <strong>Tap to choose a song</strong>
+                <p>MP3, WAV, AAC, OGG supported</p>
+            </div>
+        </div>
+
+        <!-- STEP 2: Trim -->
+        <div class="card section" id="sec2">
+            <div class="card-title">Trim your ringtone</div>
+
+            <div class="song-info" id="songInfo">
+                <div class="song-disc" id="songDisc">🎵</div>
+                <div class="song-meta">
+                    <div class="song-name" id="songName">—</div>
+                    <div class="song-duration" id="songDuration">—</div>
+                </div>
+            </div>
+
+            <div class="waveform-wrap" id="waveformWrap">
+                <canvas id="waveformCanvas"></canvas>
+                <div class="playhead" id="playhead"></div>
+            </div>
+
+            <div class="trim-section" id="trimSection">
+                <div class="trim-labels">
+                    Start: <span id="startLabel">0:00</span> &nbsp;&nbsp;&nbsp;&nbsp; End: <span id="endLabel">0:30</span>
+                </div>
+
+                <div class="range-wrap">
+                    <input type="range" id="startRange" min="0" max="100" value="0" step="0.1">
+                </div>
+                <div class="range-wrap">
+                    <input type="range" id="endRange" min="0" max="100" value="50" step="0.1" id="trimRange">
+                </div>
+
+                <div class="duration-hint">
+                    Ringtone length: <strong id="lengthDisplay">0:30</strong>
+                    <span style="color: var(--muted)"> (max 40 sec recommended)</span>
+                </div>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <div class="preview-row" id="previewRow">
+                <button class="btn btn-outline btn-sm" id="playBtn" onclick="togglePlay()">▶ Play</button>
+                <button class="btn btn-outline btn-sm" onclick="previewTrim()">🎧 Preview Trim</button>
+            </div>
+
+            <div class="time-display" id="timeDisplay"></div>
+
+            <button class="btn btn-accent" id="processBtn" onclick="processAudio()" disabled>
+      ✂️ Cut & Prepare Download
+    </button>
+        </div>
+
+        <!-- STEP 3: Download -->
+        <div class="card section" id="sec3">
+            <div class="card-title">Download &amp; Share your ringtone</div>
+            <p style="font-size:14px; color:var(--muted); margin-bottom:16px; line-height:1.6;">
+                Your trimmed ringtone is ready! Download it or share it directly with friends.
+            </p>
+
+            <!-- Download -->
+            <a id="downloadLink" href="#" download="my-ringtone.wav">
+                <button class="btn btn-success" onclick="markDownloaded()">
+        ⬇️ Download Ringtone
+      </button>
+            </a>
+
+            <!-- Share divider -->
+            <div class="share-divider">
+                <span>or share with</span>
+            </div>
+
+            <!-- Share buttons grid -->
+            <div class="share-grid">
+                <button class="share-btn whatsapp" onclick="shareWhatsApp()">
+        <span class="share-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.857L.057 23.5a.5.5 0 00.611.611l5.763-1.51A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.652-.52-5.165-1.426l-.371-.22-3.844 1.007 1.028-3.75-.242-.386A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        </span>
+        WhatsApp
+      </button>
+
+                <button class="share-btn telegram" onclick="shareTelegram()">
+        <span class="share-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        </span>
+        Telegram
+      </button>
+
+                <button class="share-btn native" onclick="shareNative()" id="nativeShareBtn">
+        <span class="share-icon">📤</span>
+        Share…
+      </button>
+
+                <button class="share-btn copy" onclick="copyShareText()" id="copyBtn">
+        <span class="share-icon">🔗</span>
+        Copy Link
+      </button>
+            </div>
+
+            <!-- Share note -->
+            <div class="share-note">
+                💡 <strong>Tip:</strong> Download first, then send the file via WhatsApp/Telegram from your Downloads folder for best quality.
+            </div>
+
+            <div style="height:8px"></div>
+            <button class="btn btn-outline" onclick="resetAll()">🔄 Start Over</button>
+        </div>
+
+        <!-- STEP 4: How to Set -->
+        <div class="card section" id="sec4">
+            <div class="card-title">Set it as your ringtone</div>
+            <div class="instructions visible">
+                <div class="instruction-step">
+                    <div class="inst-num">1</div>
+                    <div class="inst-text">Open your phone's <strong>Settings</strong> app</div>
+                </div>
+                <div class="instruction-step">
+                    <div class="inst-num">2</div>
+                    <div class="inst-text">Go to <strong>Sound &amp; Vibration</strong> → <strong>Phone Ringtone</strong></div>
+                </div>
+                <div class="instruction-step">
+                    <div class="inst-num">3</div>
+                    <div class="inst-text">Tap <strong>Add Ringtone</strong> or the <strong>+</strong> button</div>
+                </div>
+                <div class="instruction-step">
+                    <div class="inst-num">4</div>
+                    <div class="inst-text">Browse to your <strong>Downloads</strong> folder and pick <strong>my-ringtone.mp3</strong></div>
+                </div>
+                <div class="instruction-step">
+                    <div class="inst-num">5</div>
+                    <div class="inst-text">Tap <strong>Save</strong> — done! 🎉 Your song is now your ringtone.</div>
+                </div>
+            </div>
+            <div style="height:16px"></div>
+            <button class="btn btn-outline" onclick="resetAll()">🎵 Make Another Ringtone</button>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let audioContext, audioBuffer, sourceNode;
+        let isPlaying = false;
+        let startTime = 0,
+            pauseOffset = 0;
+        let trimStart = 0,
+            trimEnd = 30;
+        let totalDuration = 0;
+        let fileName = 'my-ringtone';
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadZone = document.getElementById('uploadZone');
+
+        // Drag over
+        uploadZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', e => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+        });
+
+        fileInput.addEventListener('change', e => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        async function handleFile(file) {
+            if (!file.type.startsWith('audio/')) {
+                showToast('Please pick an audio file', 'error');
+                return;
+            }
+
+            fileName = file.name.replace(/\.[^/.]+$/, '');
+            document.getElementById('songName').textContent = file.name;
+            document.getElementById('songInfo').classList.add('visible');
+
+            showToast('Loading song…');
+
+            audioContext = new(window.AudioContext || window.webkitAudioContext)();
+            const arrayBuffer = await file.arrayBuffer();
+            audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            totalDuration = audioBuffer.duration;
+
+            // Set default trim: first 30 sec (or full if shorter)
+            trimStart = 0;
+            trimEnd = Math.min(30, totalDuration);
+
+            document.getElementById('songDuration').textContent = 'Duration: ' + formatTime(totalDuration);
+
+            // Set sliders
+            const startR = document.getElementById('startRange');
+            const endR = document.getElementById('endRange');
+            startR.max = 100;
+            endR.max = 100;
+            startR.value = 0;
+            endR.value = (trimEnd / totalDuration) * 100;
+
+            updateTrimLabels();
+            drawWaveform();
+
+            document.getElementById('waveformWrap').classList.add('visible');
+            document.getElementById('trimSection').classList.add('visible');
+            document.getElementById('previewRow').classList.add('visible');
+            document.getElementById('processBtn').disabled = false;
+
+            setStep(1);
+            showSection('sec2');
+            showToast('Song loaded! Adjust the trim below.', 'success');
+        }
+
+        function drawWaveform() {
+            const canvas = document.getElementById('waveformCanvas');
+            const wrap = document.getElementById('waveformWrap');
+            canvas.width = wrap.offsetWidth * window.devicePixelRatio;
+            canvas.height = wrap.offsetHeight * window.devicePixelRatio;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const W = wrap.offsetWidth,
+                H = wrap.offsetHeight;
+            const data = audioBuffer.getChannelData(0);
+            const step = Math.ceil(data.length / W);
+
+            ctx.clearRect(0, 0, W, H);
+
+            for (let i = 0; i < W; i++) {
+                let min = 1,
+                    max = -1;
+                for (let j = 0; j < step; j++) {
+                    const val = data[i * step + j] || 0;
+                    if (val < min) min = val;
+                    if (val > max) max = val;
+                }
+                const pct = i / W;
+                const inTrim = pct >= (trimStart / totalDuration) && pct <= (trimEnd / totalDuration);
+                ctx.fillStyle = inTrim ? '#7c3aed' : '#2a2a40';
+                const y = ((1 - max) / 2) * H;
+                const h = Math.max(2, (max - min) / 2 * H);
+                ctx.fillRect(i, y, 1, h);
+            }
+        }
+
+        document.getElementById('startRange').addEventListener('input', function() {
+            const val = parseFloat(this.value) / 100 * totalDuration;
+            if (val >= trimEnd - 1) {
+                this.value = ((trimEnd - 1) / totalDuration) * 100;
+                return;
+            }
+            trimStart = val;
+            updateTrimLabels();
+            drawWaveform();
+        });
+
+        document.getElementById('endRange').addEventListener('input', function() {
+            const val = parseFloat(this.value) / 100 * totalDuration;
+            if (val <= trimStart + 1) {
+                this.value = ((trimStart + 1) / totalDuration) * 100;
+                return;
+            }
+            trimEnd = val;
+            updateTrimLabels();
+            drawWaveform();
+        });
+
+        function updateTrimLabels() {
+            document.getElementById('startLabel').textContent = formatTime(trimStart);
+            document.getElementById('endLabel').textContent = formatTime(trimEnd);
+            const len = trimEnd - trimStart;
+            document.getElementById('lengthDisplay').textContent = formatTime(len);
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                stopAudio();
+            } else {
+                playFromOffset(pauseOffset);
+            }
+        }
+
+        function playFromOffset(offset) {
+            if (!audioBuffer) return;
+            stopAudio();
+            sourceNode = audioContext.createBufferSource();
+            sourceNode.buffer = audioBuffer;
+            sourceNode.connect(audioContext.destination);
+            sourceNode.start(0, offset);
+            startTime = audioContext.currentTime - offset;
+            isPlaying = true;
+            document.getElementById('playBtn').textContent = '⏸ Pause';
+            document.getElementById('songDisc').classList.add('playing');
+            updatePlayhead();
+            sourceNode.onended = () => {
+                if (isPlaying) {
+                    stopAudio();
+                    pauseOffset = 0;
+                }
+            };
+        }
+
+        function stopAudio() {
+            if (sourceNode) {
+                try {
+                    sourceNode.stop();
+                } catch (e) {}
+            }
+            pauseOffset = isPlaying ? audioContext.currentTime - startTime : pauseOffset;
+            isPlaying = false;
+            document.getElementById('playBtn').textContent = '▶ Play';
+            document.getElementById('songDisc').classList.remove('playing');
+        }
+
+        function previewTrim() {
+            stopAudio();
+            pauseOffset = trimStart;
+            playFromOffset(trimStart);
+            // Auto stop at trimEnd
+            const duration = trimEnd - trimStart;
+            setTimeout(() => {
+                if (isPlaying) stopAudio();
+            }, duration * 1000);
+        }
+
+        function updatePlayhead() {
+            if (!isPlaying) return;
+            const current = audioContext.currentTime - startTime;
+            const pct = Math.min(current / totalDuration, 1) * 100;
+            document.getElementById('playhead').style.left = pct + '%';
+            document.getElementById('timeDisplay').textContent = formatTime(current) + ' / ' + formatTime(totalDuration);
+            requestAnimationFrame(updatePlayhead);
+        }
+
+        async function processAudio() {
+            document.getElementById('processBtn').disabled = true;
+            document.getElementById('processBtn').textContent = '⏳ Processing…';
+            showToast('Cutting your ringtone…');
+
+            await new Promise(r => setTimeout(r, 50)); // let UI update
+
+            const sampleRate = audioBuffer.sampleRate;
+            const startSample = Math.floor(trimStart * sampleRate);
+            const endSample = Math.floor(trimEnd * sampleRate);
+            const length = endSample - startSample;
+
+            const offlineCtx = new OfflineAudioContext(
+                audioBuffer.numberOfChannels,
+                length,
+                sampleRate
+            );
+
+            const src = offlineCtx.createBufferSource();
+
+            // Create trimmed buffer
+            const trimmedBuffer = offlineCtx.createBuffer(
+                audioBuffer.numberOfChannels,
+                length,
+                sampleRate
+            );
+            for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++) {
+                const srcData = audioBuffer.getChannelData(ch).subarray(startSample, endSample);
+                trimmedBuffer.getChannelData(ch).set(srcData);
+            }
+
+            src.buffer = trimmedBuffer;
+            src.connect(offlineCtx.destination);
+            src.start();
+
+            const rendered = await offlineCtx.startRendering();
+            const wavBlob = bufferToWav(rendered);
+            ringtoneBlob = wavBlob;
+            ringtoneFileName = fileName + '-ringtone.wav';
+            const url = URL.createObjectURL(wavBlob);
+
+            const link = document.getElementById('downloadLink');
+            link.href = url;
+            link.download = ringtoneFileName;
+
+            setStep(2);
+            showSection('sec3');
+            document.getElementById('processBtn').textContent = '✂️ Cut & Prepare Download';
+            document.getElementById('processBtn').disabled = false;
+            showToast('Ready to download! 🎉', 'success');
+            stopAudio();
+        }
+
+        function markDownloaded() {
+            setTimeout(() => {
+                setStep(3);
+                showSection('sec4');
+            }, 800);
+        }
+
+        function bufferToWav(buffer) {
+            const numChannels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+            const format = 1; // PCM
+            const bitDepth = 16;
+            const bytesPerSample = bitDepth / 8;
+            const blockAlign = numChannels * bytesPerSample;
+            const numSamples = buffer.length;
+            const dataSize = numSamples * blockAlign;
+            const bufferSize = 44 + dataSize;
+            const arrayBuffer = new ArrayBuffer(bufferSize);
+            const view = new DataView(arrayBuffer);
+
+            function writeStr(offset, str) {
+                for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+            }
+            writeStr(0, 'RIFF');
+            view.setUint32(4, 36 + dataSize, true);
+            writeStr(8, 'WAVE');
+            writeStr(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, format, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * blockAlign, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitDepth, true);
+            writeStr(36, 'data');
+            view.setUint32(40, dataSize, true);
+
+            let offset = 44;
+            for (let i = 0; i < numSamples; i++) {
+                for (let ch = 0; ch < numChannels; ch++) {
+                    const sample = Math.max(-1, Math.min(1, buffer.getChannelData(ch)[i]));
+                    view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                    offset += 2;
+                }
+            }
+            return new Blob([arrayBuffer], {
+                type: 'audio/wav'
+            });
+        }
+
+        let ringtoneBlob = null;
+        let ringtoneFileName = 'my-ringtone.wav';
+
+        function shareWhatsApp() {
+            const msg = encodeURIComponent(`🎵 Check out my custom ringtone I made with RingCut!\n\nMake your own at: ${window.location.href}`);
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+            showToast('💡 Also share the .wav file from your Downloads!', '');
+        }
+
+        function shareTelegram() {
+            const msg = encodeURIComponent(`🎵 I made a custom ringtone! Make yours too:`);
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://t.me/share/url?url=${url}&text=${msg}`, '_blank');
+            showToast('💡 Also send the .wav file from your Downloads!', '');
+        }
+
+        async function shareNative() {
+            if (!ringtoneBlob) {
+                showToast('Download the ringtone first!', 'error');
+                return;
+            }
+            if (navigator.share) {
+                try {
+                    const file = new File([ringtoneBlob], ringtoneFileName, {
+                        type: 'audio/wav'
+                    });
+                    if (navigator.canShare && navigator.canShare({
+                            files: [file]
+                        })) {
+                        await navigator.share({
+                            title: '🎵 My Custom Ringtone',
+                            text: 'Check out this ringtone I made with RingCut!',
+                            files: [file]
+                        });
+                        showToast('Shared successfully! 🎉', 'success');
+                    } else {
+                        await navigator.share({
+                            title: '🎵 RingCut – Make Your Ringtone',
+                            text: 'I made a custom ringtone! Make yours too:',
+                            url: window.location.href
+                        });
+                    }
+                } catch (e) {
+                    if (e.name !== 'AbortError') showToast('Could not share. Try another option.', 'error');
+                }
+            } else {
+                showToast('Sharing not supported in this browser. Try WhatsApp or Telegram!', 'error');
+            }
+        }
+
+        function copyShareText() {
+            const text = `🎵 Make your own custom ringtone at: ${window.location.href}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    document.getElementById('copyBtn').innerHTML = '<span class="share-icon">✅</span> Copied!';
+                    showToast('Link copied to clipboard!', 'success');
+                    setTimeout(() => {
+                        document.getElementById('copyBtn').innerHTML = '<span class="share-icon">🔗</span> Copy Link';
+                    }, 2000);
+                });
+            } else {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('Link copied!', 'success');
+            }
+        }
+
+        function resetAll() {
+            audioBuffer = null;
+            sourceNode = null;
+            isPlaying = false;
+            pauseOffset = 0;
+            trimStart = 0;
+            trimEnd = 30;
+            totalDuration = 0;
+            fileInput.value = '';
+            document.getElementById('songInfo').classList.remove('visible');
+            document.getElementById('waveformWrap').classList.remove('visible');
+            document.getElementById('trimSection').classList.remove('visible');
+            document.getElementById('previewRow').classList.remove('visible');
+            document.getElementById('processBtn').disabled = true;
+            document.getElementById('timeDisplay').textContent = '';
+            document.getElementById('playhead').style.left = '0';
+            setStep(-1);
+            showSection('sec1');
+        }
+
+        function showSection(id) {
+            ['sec1', 'sec2', 'sec3', 'sec4'].forEach(s => {
+                document.getElementById(s).classList.toggle('visible', s === id);
+            });
+        }
+
+        function setStep(active) {
+            // active: -1=none done, 0=s1 active, 1=s1 done s2 active, 2=s2 done s3 active, 3=all done
+            const steps = ['s1', 's2', 's3', 's4'];
+            steps.forEach((s, i) => {
+                const el = document.getElementById(s);
+                el.classList.remove('active', 'done');
+                if (i < active + 1) el.classList.add('done');
+                else if (i === active + 1) el.classList.add('active');
+            });
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return m + ':' + String(s).padStart(2, '0');
+        }
+
+        function showToast(msg, type = '') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Init step
+        setStep(-1);
+    </script>
+</body>
+
+</html>
